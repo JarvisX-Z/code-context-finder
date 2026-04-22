@@ -14,3 +14,36 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Takes a user query and list of files, performs keyword matching, dependency tracing, and returns the top 5 most relevant files with scores.
+
+ * @summary Analyze codebase and return relevant files
+ */
+export const AnalyzeCodebaseBody = zod.object({
+  query: zod.string().describe("Search query to match against files"),
+  files: zod.array(
+    zod.object({
+      filename: zod.string(),
+      content: zod.string(),
+    }),
+  ),
+});
+
+export const AnalyzeCodebaseResponse = zod.object({
+  query: zod.string(),
+  totalFilesScanned: zod.number(),
+  results: zod.array(
+    zod.object({
+      filename: zod.string(),
+      content: zod.string(),
+      score: zod.number().describe("Relevance score (0-100)"),
+      matchedKeywords: zod
+        .array(zod.string())
+        .describe("Keywords from the query that matched in this file"),
+      reason: zod
+        .string()
+        .describe("Human-readable explanation of why this file was included"),
+    }),
+  ),
+});

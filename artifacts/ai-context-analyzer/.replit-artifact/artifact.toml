@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "AI Context Analyzer"
+version = "1.0.0"
+id = "artifacts/ai-context-analyzer"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21201
+
+[services.development]
+run = "pnpm --filter @workspace/ai-context-analyzer run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ai-context-analyzer", "run", "build" ]
+publicDir = "artifacts/ai-context-analyzer/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21201"
+BASE_PATH = "/"

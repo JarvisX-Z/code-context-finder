@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: analyze
+    description: Codebase analysis operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /analyze:
+    post:
+      operationId: analyzeCodebase
+      tags: [analyze]
+      summary: Analyze codebase and return relevant files
+      description: >
+        Takes a user query and list of files, performs keyword matching,
+        dependency tracing, and returns the top 5 most relevant files with scores.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeRequest"
+      responses:
+        "200":
+          description: Analysis results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyzeResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +62,72 @@ components:
           type: string
       required:
         - status
-
+    FileInput:
+      type: object
+      properties:
+        filename:
+          type: string
+        content:
+          type: string
+      required:
+        - filename
+        - content
+    AnalyzeRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Search query to match against files
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileInput"
+      required:
+        - query
+        - files
+    AnalyzedFile:
+      type: object
+      properties:
+        filename:
+          type: string
+        content:
+          type: string
+        score:
+          type: number
+          description: Relevance score (0-100)
+        matchedKeywords:
+          type: array
+          items:
+            type: string
+          description: Keywords from the query that matched in this file
+        reason:
+          type: string
+          description: Human-readable explanation of why this file was included
+      required:
+        - filename
+        - content
+        - score
+        - matchedKeywords
+        - reason
+    AnalyzeResponse:
+      type: object
+      properties:
+        query:
+          type: string
+        totalFilesScanned:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyzedFile"
+      required:
+        - query
+        - totalFilesScanned
+        - results
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

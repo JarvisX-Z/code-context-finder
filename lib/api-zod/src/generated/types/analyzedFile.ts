@@ -5,20 +5,6 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
-
-export interface FileInput {
-  filename: string;
-  content: string;
-}
-
-export interface AnalyzeRequest {
-  /** Search query to match against files */
-  query: string;
-  files: FileInput[];
-}
 
 export interface AnalyzedFile {
   filename: string;
@@ -29,14 +15,4 @@ export interface AnalyzedFile {
   matchedKeywords: string[];
   /** Human-readable explanation of why this file was included */
   reason: string;
-}
-
-export interface AnalyzeResponse {
-  query: string;
-  totalFilesScanned: number;
-  results: AnalyzedFile[];
-}
-
-export interface ErrorResponse {
-  error: string;
 }

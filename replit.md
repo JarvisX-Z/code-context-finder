@@ -25,3 +25,27 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+
+## Artifacts
+
+### AI Context Analyzer (/)
+
+A fullstack developer tool that analyzes codebases by accepting a user query and returning the most relevant files with relevance scores.
+
+**Frontend:** React + Vite (`artifacts/ai-context-analyzer`)
+- Dark IDE-like aesthetic with sidebar navigation
+- Query input field with pre-loaded 10 mock files
+- Toggleable file list (include/exclude files from analysis)
+- Results panel with relevance scores, matched keywords, and file content
+
+**Backend:** Express API (`artifacts/api-server`)
+- `POST /api/analyze` — analyzes files against a query
+- Keyword matching with frequency-based scoring
+- Dependency tracing (files imported by matched files get a bonus score)
+- Returns top 5 most relevant files with scores and explanations
+
+**Analyze Logic** (`artifacts/api-server/src/lib/analyzer.ts`):
+1. Tokenizes the query into keywords
+2. Scores each file by keyword frequency in content + filename match bonus
+3. Traces imports: if a matched file imports another, that file gets +15 score boost
+4. Returns top 5 results sorted by score (0–100)
