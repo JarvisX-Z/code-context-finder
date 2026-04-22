@@ -39,9 +39,12 @@
   --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-destructive-border: var(--destructive-border);
 
-  --font-sans: "Space Grotesk", var(--app-font-sans);
-  --font-serif: var(--app-font-serif);
-  --font-mono: "Fira Code", var(--app-font-mono);
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -49,91 +52,148 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Shared across both light root and .dark (app is forced dark) */
 :root {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
+  --background:   220 22% 7%;
+  --foreground:   215 28% 93%;
 
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --card-border: 217.2 32.6% 17.5%;
+  --card:         220 20% 10%;
+  --card-foreground: 215 28% 93%;
+  --card-border:  220 16% 18%;
 
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 217.2 32.6% 17.5%;
+  --sidebar:      220 22% 6%;
+  --sidebar-foreground: 215 28% 80%;
+  --sidebar-border: 220 16% 13%;
 
-  --primary: 191 91% 36%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --primary-border: 191 91% 36%;
+  --popover:      220 20% 10%;
+  --popover-foreground: 215 28% 93%;
+  --popover-border: 220 16% 18%;
 
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --secondary-border: 217.2 32.6% 17.5%;
+  --primary:      186 97% 42%;
+  --primary-foreground: 220 22% 7%;
+  --primary-border: 186 97% 36%;
 
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --muted-border: 217.2 32.6% 17.5%;
+  --secondary:    220 16% 15%;
+  --secondary-foreground: 215 20% 80%;
+  --secondary-border: 220 16% 20%;
 
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-  --accent-border: 217.2 32.6% 17.5%;
+  --muted:        220 16% 13%;
+  --muted-foreground: 215 16% 52%;
+  --muted-border: 220 16% 18%;
 
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --destructive-border: 0 62.8% 30.6%;
+  --accent:       220 16% 15%;
+  --accent-foreground: 215 28% 93%;
+  --accent-border: 220 16% 20%;
 
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 191 91% 36%;
+  --destructive:  0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --destructive-border: 0 72% 44%;
 
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: Georgia, serif;
+  --border:       220 16% 18%;
+  --input:        220 16% 16%;
+  --ring:         186 97% 42%;
+
+  --app-font-sans: 'Inter', system-ui, sans-serif;
   --app-font-mono: 'JetBrains Mono', monospace;
-  
   --radius: 0.5rem;
+
+  /* Elevation overlays */
+  --elevate-1: rgba(255,255,255,.04);
+  --elevate-2: rgba(255,255,255,.08);
+  --opaque-button-border-intensity: 6;
+  --button-outline: rgba(255,255,255,.10);
+  --badge-outline: rgba(255,255,255,.05);
+
+  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
 .dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
+  --background:   220 22% 7%;
+  --foreground:   215 28% 93%;
 
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --card-border: 217.2 32.6% 17.5%;
+  --card:         220 20% 10%;
+  --card-foreground: 215 28% 93%;
+  --card-border:  220 16% 18%;
 
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 217.2 32.6% 17.5%;
+  --sidebar:      220 22% 6%;
+  --sidebar-foreground: 215 28% 80%;
+  --sidebar-border: 220 16% 13%;
 
-  --primary: 191 91% 36%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --primary-border: 191 91% 36%;
+  --popover:      220 20% 10%;
+  --popover-foreground: 215 28% 93%;
+  --popover-border: 220 16% 18%;
 
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --secondary-border: 217.2 32.6% 17.5%;
+  --primary:      186 97% 42%;
+  --primary-foreground: 220 22% 7%;
+  --primary-border: 186 97% 36%;
 
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --muted-border: 217.2 32.6% 17.5%;
+  --secondary:    220 16% 15%;
+  --secondary-foreground: 215 20% 80%;
+  --secondary-border: 220 16% 20%;
 
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-  --accent-border: 217.2 32.6% 17.5%;
+  --muted:        220 16% 13%;
+  --muted-foreground: 215 16% 52%;
+  --muted-border: 220 16% 18%;
 
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --destructive-border: 0 62.8% 30.6%;
+  --accent:       220 16% 15%;
+  --accent-foreground: 215 28% 93%;
+  --accent-border: 220 16% 20%;
 
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 191 91% 36%;
+  --destructive:  0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --destructive-border: 0 72% 44%;
+
+  --border:       220 16% 18%;
+  --input:        220 16% 16%;
+  --ring:         186 97% 42%;
 }
 
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.4);
+  }
+}
+
+@layer utilities {
+  .font-mono {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-feature-settings: "liga" 1, "calt" 1;
+  }
+
+  .score-bar {
+    height: 3px;
+    border-radius: 2px;
+    background: hsl(var(--secondary));
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
