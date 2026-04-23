@@ -1,24 +1,26 @@
-We welcome contributions to improve Code Context Finder AI and make it more powerful for developers and AI systems.
-This project is open-source and community-driven. Whether you are fixing bugs, improving performance, or suggesting new features, your contribution is valuable.
+# 🤝 Contributing to Code Context Finder AI
 
-🧠 How You Can Contribute
-🐛 Report bugs with clear reproduction steps
-⚡ Improve performance and optimize existing logic
-🧩 Fix issues labeled as good first issue
-✨ Suggest and implement new features
-📝 Improve documentation and readability
+Thank you for your interest in contributing. This project aims to improve AI-powered code understanding by extracting relevant context from large codebases.
 
-🔧 Workflow
-Fork the repository
-Create a new branch for your changes
-Make your improvements
-Submit a pull request with a clear explanation
+## 🧠 How to Contribute
+- 🐛 Report bugs with clear steps to reproduce  
+- ✨ Suggest new features with proper explanation  
+- 🔧 Fix issues or improve existing code  
+- 📝 Improve documentation and README  
 
-📌 Guidelines
-Follow existing code structure and style
-Keep changes clean and minimal
-Ensure code is tested before submission
-Be respectful and collaborative in discussions
+## 🚀 Workflow
+1. Fork the repository  
+2. Create a new branch (`feature-name`)  
+3. Make your changes  
+4. Commit changes with clear messages  
+5. Push to your fork  
+6. Open a Pull Request  
 
-🚀 Goal
-Our goal is to build a high-performance AI-powered code context system that helps developers efficiently work with large codebases.
+## 📏 Guidelines
+- Follow existing code structure  
+- Keep changes clean and minimal  
+- Ensure functionality is not broken  
+- Write clear commit messages  
+
+## 🎯 Goal
+Build a high-performance AI system that intelligently extracts and optimizes code context for developers and AI models.
