@@ -24,3 +24,5 @@ jobs:
 
       - name: Build project
         run: pnpm build
+        env:
+          PORT: 3000
