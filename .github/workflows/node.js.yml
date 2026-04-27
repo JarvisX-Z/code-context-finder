@@ -16,4 +16,11 @@ jobs:
         with:
           node-version: 18
 
-      - run: npm install --legacy-peer-deps
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
+        run: pnpm build
