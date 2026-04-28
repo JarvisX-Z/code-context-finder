@@ -5,11 +5,7 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { mockupPreviewPlugin } from "./mockupPreviewPlugin";
 
-const port = Number(process.env.PORT || 3000);
-
-if (Number.isNaN(port) || port <= 0) {
-  throw new Error(`Invalid PORT value: "${process.env.PORT}"`);
-}
+const port = Number(process.env.PORT) > 0 ? Number(process.env.PORT) : 3000;
 
 const basePath = process.env.BASE_PATH || "/";
 
