@@ -8,6 +8,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      PORT: 3000
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
