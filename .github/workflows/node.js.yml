@@ -1,4 +1,4 @@
-name: Context Analyzer CI
+name: Node.js CI
 
 on:
   push:
@@ -8,22 +8,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:   # ✅ GLOBAL ENV (important)
-      PORT: 3000
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build project
-        run: pnpm build
+      - name: Run build
+        run: pnpm run build
