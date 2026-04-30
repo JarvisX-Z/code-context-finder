@@ -90,18 +90,52 @@ export default function AnalyzerPage() {
             </p>
           </div>
           {data && (
-            <div className="flex items-center gap-5 text-sm shrink-0 ml-6">
-              <div className="text-right">
-                <p className="text-muted-foreground text-xs mb-0.5">Files scanned</p>
-                <p className="font-semibold font-mono">{data.totalFilesScanned}</p>
-              </div>
-              <div className="w-px h-8 bg-border" />
-              <div className="text-right">
-                <p className="text-muted-foreground text-xs mb-0.5">Matches found</p>
-                <p className="font-semibold font-mono text-primary">{data.results.length}</p>
-              </div>
-            </div>
-          )}
+      <div className="flex items-center gap-3 text-sm shrink-0 ml-6">
+
+        {/* Export buttons */}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => handleExport("json")}
+          >
+          Export JSON
+        </Button>
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => handleExport("json")}
+          >
+          <FileText className="h-3.5 w-3.5 mr-1" />
+          JSON
+        </Button>
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => handleExport("md")}
+          >
+          <FileText className="h-3.5 w-3.5 mr-1" />
+          MD
+        </Button>
+
+        {/* Stats */}
+        <div className="text-right ml-3">
+          <p className="text-muted-foreground text-xs mb-0.5">Files scanned</p>
+          <p className="font-semibold font-mono">{data.totalFilesScanned}</p>
+        </div>
+
+        <div className="w-px h-8 bg-border" />
+
+        <div className="text-right">
+          <p className="text-muted-foreground text-xs mb-0.5">Matches found</p>
+          <p className="font-semibold font-mono text-primary">
+            {data.results.length}
+          </p>
+        </div>
+
+      </div>
+    )}
         </div>
       </div>
 
