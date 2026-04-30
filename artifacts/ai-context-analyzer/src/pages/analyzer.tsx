@@ -89,18 +89,11 @@ export default function AnalyzerPage() {
               Surface relevant files from a codebase using keyword matching and dependency tracing.
             </p>
           </div>
+
           {data && (
       <div className="flex items-center gap-3 text-sm shrink-0 ml-6">
 
-        {/* Export buttons */}
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => handleExport("json")}
-          >
-          Export JSON
-        </Button>
-
+        {/* JSON Export */}
         <Button
           size="sm"
           variant="outline"
@@ -110,14 +103,16 @@ export default function AnalyzerPage() {
           JSON
         </Button>
 
+        {/* Markdown Export */}
         <Button
           size="sm"
           variant="outline"
           onClick={() => handleExport("md")}
           >
+
           <FileText className="h-3.5 w-3.5 mr-1" />
           MD
-        </Button>
+    </Button>
 
         {/* Stats */}
         <div className="text-right ml-3">
@@ -135,7 +130,7 @@ export default function AnalyzerPage() {
         </div>
 
       </div>
-    )}
+    )}  
         </div>
       </div>
 
