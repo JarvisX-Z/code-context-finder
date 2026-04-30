@@ -77,6 +77,46 @@ export default function AnalyzerPage() {
 
   const { isPending, data, isError, error } = analyzeCodebase;
   const apiError = error as any;
+  const handleExport = (type: "json" | "md") => {
+  if (!data || !data.results) return;
+
+  try {
+    if (type === "json") {
+      const blob = new Blob(
+        [JSON.stringify(data, null, 2)],
+        { type: "application/json" }
+      );
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "context.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    if (type === "md") {
+      const md = `# AI Context Output
+
+Query: ${data.query ?? ""}
+
+Files Scanned: ${data.totalFilesScanned ?? 0}
+Matches Found: ${data.results?.length ?? 0}
+`;
+
+      const blob = new Blob([md], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "context.md";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  } catch (err) {
+    console.error("Export failed:", err);
+  }
+};
 
   return (
     <div className="flex flex-col h-full">
@@ -125,7 +165,7 @@ export default function AnalyzerPage() {
         <div className="text-right">
           <p className="text-muted-foreground text-xs mb-0.5">Matches found</p>
           <p className="font-semibold font-mono text-primary">
-            {data.results.length}
+            {data.results?.length ?? 0}
           </p>
         </div>
 
