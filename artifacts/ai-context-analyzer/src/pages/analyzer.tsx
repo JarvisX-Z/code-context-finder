@@ -1,15 +1,153 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAnalyzeCodebase } from "@workspace/api-client-react";
 import { mockFiles } from "@/lib/mock-files";
 import {
-  Search, Loader2, FileCode2, BarChart3, AlertCircle,
+  Search, Loader2, FileCode2, AlertCircle,
   ScanSearch, FileText, CheckSquare, Square, Minus,
-  ChevronRight, Hash
+  ChevronRight, Hash, RefreshCw, WifiOff, ServerCrash, ShieldAlert
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// ─── Error classification ────────────────────────────────────────────────────
+
+type ErrorKind = "network" | "validation" | "server" | "unknown";
+
+interface ClassifiedError {
+  kind: ErrorKind;
+  title: string;
+  message: string;
+  icon: React.ReactNode;
+}
+
+function classifyError(error: unknown): ClassifiedError {
+  const err = error as any;
+
+  // Network / fetch failure
+  if (
+    err instanceof TypeError ||
+    err?.message?.toLowerCase().includes("fetch") ||
+    err?.message?.toLowerCase().includes("network") ||
+    err?.message?.toLowerCase().includes("failed to fetch")
+  ) {
+    return {
+      kind: "network",
+      title: "Network error",
+      message: "Could not reach the server. Check your connection and try again.",
+      icon: <WifiOff className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />,
+    };
+  }
+
+  // HTTP 400 – validation
+  if (err?.status === 400 || err?.statusCode === 400) {
+    return {
+      kind: "validation",
+      title: "Invalid request",
+      message: err?.error ?? err?.message ?? "The request was rejected. Check your query and selected files.",
+      icon: <ShieldAlert className="h-4 w-4 text-yellow-400 shrink-0 mt-0.5" />,
+    };
+  }
+
+  // HTTP 5xx – server
+  if (err?.status >= 500 || err?.statusCode >= 500) {
+    return {
+      kind: "server",
+      title: "Server error",
+      message: "The analysis server encountered an error. Please try again in a moment.",
+      icon: <ServerCrash className="h-4 w-4 text-rose-400 shrink-0 mt-0.5" />,
+    };
+  }
+
+  // Fallback
+  return {
+    kind: "unknown",
+    title: "Analysis failed",
+    message: err?.error ?? err?.message ?? "An unexpected error occurred. Please try again.",
+    icon: <AlertCircle className="h-4 w-4 text-rose-400 shrink-0 mt-0.5" />,
+  };
+}
+
+// ─── Animated loading steps ──────────────────────────────────────────────────
+
+const LOADING_STEPS = [
+  "Tokenising query",
+  "Scanning files",
+  "Tracing imports",
+  "Scoring relevance",
+  "Ranking results",
+] as const;
+
+function useLoadingSteps(active: boolean) {
+  const [stepIndex, setStepIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (!active) {
+      setStepIndex(0);
+      setProgress(0);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      return;
+    }
+
+    setStepIndex(0);
+    setProgress(0);
+
+    const stepDuration = 600; // ms per step
+    let current = 0;
+
+    intervalRef.current = setInterval(() => {
+      current += 1;
+      if (current < LOADING_STEPS.length) {
+        setStepIndex(current);
+        setProgress(Math.round((current / LOADING_STEPS.length) * 100));
+      } else {
+        // Hold at last step until the real response arrives
+        setProgress(90);
+        if (intervalRef.current) clearInterval(intervalRef.current);
+      }
+    }, stepDuration);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [active]);
+
+  return { step: LOADING_STEPS[stepIndex], stepIndex, progress };
+}
+
+// ─── Skeleton result card ────────────────────────────────────────────────────
+
+function SkeletonResultCard() {
+  return (
+    <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border/40 bg-[hsl(220_20%_11%)]">
+        <Skeleton className="h-3 w-5 rounded" />
+        <Skeleton className="h-4 w-10 rounded" />
+        <Skeleton className="h-4 flex-1 rounded" />
+        <Skeleton className="h-3 w-16 rounded" />
+      </div>
+      <div className="px-4 py-3 space-y-2">
+        <Skeleton className="h-3 w-full rounded" />
+        <Skeleton className="h-3 w-4/5 rounded" />
+        <div className="flex gap-1.5 pt-1">
+          <Skeleton className="h-4 w-16 rounded-full" />
+          <Skeleton className="h-4 w-12 rounded-full" />
+          <Skeleton className="h-4 w-20 rounded-full" />
+        </div>
+      </div>
+      <div className="border-t border-border/40 px-4 py-3 bg-[hsl(220_22%_7%)]">
+        <Skeleton className="h-24 w-full rounded" />
+      </div>
+    </div>
+  );
+}
+
+// ─── File helpers ─────────────────────────────────────────────────────────────
 
 function getFileExtension(filename: string): string {
   return filename.split(".").pop()?.toUpperCase() ?? "FILE";
@@ -50,6 +188,10 @@ export default function AnalyzerPage() {
   );
 
   const analyzeCodebase = useAnalyzeCodebase();
+  const { isPending, data, isError, error } = analyzeCodebase;
+
+  const { step: loadingStep, progress: loadingProgress } = useLoadingSteps(isPending);
+  const classifiedError = isError ? classifyError(error) : null;
 
   const allSelected   = selectedFiles.size === mockFiles.length;
   const noneSelected  = selectedFiles.size === 0;
@@ -75,8 +217,13 @@ export default function AnalyzerPage() {
     });
   };
 
-  const { isPending, data, isError, error } = analyzeCodebase;
-  const apiError = error as any;
+  const handleRetry = () => {
+    if (!query.trim() || noneSelected) return;
+    analyzeCodebase.mutate({
+      data: { query, files: mockFiles.filter(f => selectedFiles.has(f.filename)) }
+    });
+  };
+
   const handleExport = (type: "json" | "md") => {
   if (!data || !data.results) return;
 
@@ -265,15 +412,33 @@ Matches Found: ${data.results?.length ?? 0}
         <div className="flex-1 flex flex-col min-w-0">
 
           {/* Error */}
-          {isError && (
-            <div className="m-6 p-4 rounded-lg border border-rose-500/20 bg-rose-500/5 flex items-start gap-3">
-              <AlertCircle className="h-4 w-4 text-rose-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-rose-400">Analysis failed</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {apiError?.error ?? "An unexpected error occurred. Please try again."}
-                </p>
+          {isError && classifiedError && (
+            <div className="m-6 p-4 rounded-lg border border-rose-500/20 bg-rose-500/5">
+              <div className="flex items-start gap-3">
+                {classifiedError.icon}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-rose-400">{classifiedError.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                    {classifiedError.message}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleRetry}
+                  disabled={isPending}
+                  className="shrink-0 h-7 text-xs border-rose-500/20 hover:border-rose-500/40 hover:bg-rose-500/5"
+                >
+                  <RefreshCw className="h-3 w-3 mr-1.5" />
+                  Retry
+                </Button>
               </div>
+              {classifiedError.kind === "validation" && (
+                <ul className="mt-3 ml-7 space-y-1 text-xs text-muted-foreground list-disc list-inside">
+                  <li>Make sure your query is not empty</li>
+                  <li>Select at least one file before running analysis</li>
+                </ul>
+              )}
             </div>
           )}
 
@@ -303,12 +468,43 @@ Matches Found: ${data.results?.length ?? 0}
 
           {/* Loading state */}
           {isPending && (
-            <div className="flex-1 flex flex-col items-center justify-center gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-primary/60" />
-              <div className="text-center">
-                <p className="text-sm font-medium">Scanning codebase</p>
-                <p className="text-xs font-mono text-muted-foreground mt-1">matching keywords · tracing imports · scoring relevance</p>
+            <div className="flex-1 flex flex-col min-h-0">
+              {/* Progress header */}
+              <div className="px-7 pt-6 pb-4 border-b border-border/40">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-primary/70" />
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {loadingStep}…
+                    </span>
+                  </div>
+                  <span className="text-xs font-mono text-muted-foreground/60">
+                    {loadingProgress}%
+                  </span>
+                </div>
+                <Progress value={loadingProgress} className="h-1" />
+                <div className="flex gap-1.5 mt-3">
+                  {LOADING_STEPS.map((s, i) => (
+                    <div
+                      key={s}
+                      className={`flex-1 h-0.5 rounded-full transition-colors duration-300 ${
+                        i <= LOADING_STEPS.indexOf(loadingStep as typeof LOADING_STEPS[number])
+                          ? "bg-primary/60"
+                          : "bg-border/40"
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
+
+              {/* Skeleton cards */}
+              <ScrollArea className="flex-1">
+                <div className="px-7 py-6 space-y-3">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <SkeletonResultCard key={i} />
+                  ))}
+                </div>
+              </ScrollArea>
             </div>
           )}
 
